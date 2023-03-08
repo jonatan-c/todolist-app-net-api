@@ -3,6 +3,7 @@ using todolistapi.Models;
 using todolistapi.Models.DataModels;
 using todolistapi.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace todolistapi.Repositories
 
@@ -21,7 +22,19 @@ public class TaskListRepository : IRepository<Tasklist>
     //TODO GET ALL
       public async Task<IEnumerable<Tasklist>> GetAll()
     {
+        // var sql = "SELECT * FROM tasklist";
+        // var result = await _dbContext.Tasklists.FromSqlRaw(sql).ToListAsync();
+        // return result;
         return await _dbContext.Tasklists.ToListAsync();
+    }
+
+     //TODO GET ALL by TITLE
+    // http://localhost:5000/api/tasklist/?title=matematica
+    public async Task<IEnumerable<Tasklist>> GetAllByTitle(string title)
+    {
+        var sql = $"SELECT * FROM tasklist WHERE title LIKE '%{title}%'";
+        var result = await _dbContext.Tasklists.FromSqlRaw(sql).ToListAsync();
+        return result;
     }
 
     //TODO GET BY ID

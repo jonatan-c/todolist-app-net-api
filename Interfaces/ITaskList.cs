@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using todolistapi.Models.DataModels;
   
 namespace todolistapi.Interfaces
@@ -8,6 +9,8 @@ namespace todolistapi.Interfaces
     public interface IRepository<Tasklist>  
     {  
         public Task<IEnumerable<Tasklist>> GetAll();
+
+        public Task<IEnumerable<Tasklist>> GetAllByTitle(string title);
   
         public Task<Tasklist> GetById(int Id);
 

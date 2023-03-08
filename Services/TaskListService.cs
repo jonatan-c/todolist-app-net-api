@@ -38,6 +38,11 @@ public class TaskListService
         return await _taskListRepository.GetAll();
     }
 
+    public async Task<IEnumerable<Tasklist>> GetAllByTitle(string title)
+    {
+        return await _taskListRepository.GetAllByTitle(title);
+    }
+
     public async Task<Tasklist> GetById(int Id)
     {
         return await _taskListRepository.GetById(Id);

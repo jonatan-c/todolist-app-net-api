@@ -2,6 +2,10 @@
 using todolistapi.Services;
 using todolistapi.Models.DataModels;
 using Microsoft.AspNetCore.Mvc;
+using todolistapi.Models;
+using Microsoft.EntityFrameworkCore;
+using todolistapi.Pagination;
+using System.Text.Json;
 
 namespace todolistapi.Controllers;
 
@@ -13,9 +17,28 @@ public class TaskListController : ControllerBase
 
     //TODO Injeccions
     private readonly TaskListService _taskListService;
-    public TaskListController(TaskListService taskListService)
+    //TODO for pagination
+    TodolistContext _dbContext;
+    public TaskListController(TaskListService taskListService,TodolistContext dbContext)
     {
         _taskListService = taskListService;
+        _dbContext = dbContext;
+    }
+
+    //TODO GET ALL PAgination
+    [HttpGet("newtasklist")]
+    public async Task<IEnumerable<Tasklist>> GetByPagination([FromQuery] string title, [FromQuery] PaginationParams @params )
+    {
+        var employees = await _dbContext.Tasklists.Where(e => e.Title.ToLower().Trim().Contains(title.ToLower().Trim())).ToListAsync();
+
+        var paginationMetadata = new PaginationMetadata(employees.Count() , @params.Page, @params.ItemsPerPage);
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+
+        var items = employees.Skip((@params.Page - 1) * @params.ItemsPerPage).Take(@params.ItemsPerPage);
+
+        return items;
+
+        
     }
 
 
@@ -24,6 +47,14 @@ public class TaskListController : ControllerBase
     public async Task<IEnumerable<Tasklist>> Get()
     {
         return await _taskListService.GetAll();
+    }
+
+    //TODO GET ALL by TITLE
+    // http://localhost:5000/api/tasklist/?title=matematica
+    [HttpGet("/{title}")]
+    public async Task<IEnumerable<Tasklist>> GetByTitle( [FromRoute] string title)
+    {
+        return await _taskListService.GetAllByTitle(title);
     }
 
     //TODO GET BY ID
